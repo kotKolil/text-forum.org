@@ -17,13 +17,7 @@ import random
 app = FastAPI()
 
 #генератор индефикаторов сессии
-def gri():
-	#unique indeficator of session
-	uis = " "
-	symbols = string.ascii_uppercase
-	for i in range(random.randint(5,10)):
-		uis += random.choice(symbols)
-	return uis
+
 
 
 
@@ -48,6 +42,13 @@ def info_users():
 
 	return data
 
+def gri():
+	#unique indeficator of session
+	uis = " "
+	symbols = string.ascii_lowercase + "1234567890~!@#$%^&*())_{}:<>??"
+	for i in range(random.randint(5,10)):
+		uis += random.choice(symbols)
+	return uis
 
 
 def list_thd():
@@ -91,20 +92,30 @@ def logins():
 	logins = {"petya123"}
 	return logins
 		
-#регистрация
 @app.get("/registrate/{login}/{password}")
 def reg(login, password):
-  conn = sql.connect('db.db', timeout=7)
-  cursor = conn.cursor()
+    data = info_users()
+    for i in range(len(data)):
+        if data[i][0] == login:
+            return {"403": "такой пользователь уже существует"}
+    
+    ids = gri()
+    for i in range(len(data)):
+        if data[i][3] == ids:
+            ids = gri()
+    
+    conn = sql.connect('db.db', timeout=7)
+    cursor = conn.cursor()
+    expression = """INSERT INTO users (USERNAME, PSWD, IPS) VALUES (?, ?, ?)"""
+    params = (login, password, ids)
+    
+    # Выполнение INSERT запроса
+    cursor.execute(expression, params)
+    conn.commit()
 
-  expression = (f"""INSERT INTO users (USERNAME , PSWD) VALUES ('{login}', '{password}')""") 
-
-  # Выполнение INSERT запроса
-  cursor.execute(expression)
-  conn.commit()
-
-  # Закрытие соединения с базой данных
-  conn.close()
+    # Закрытие соединения с базой данных
+    conn.close()
+    return {"200": ids}
 
 #аунтефикация
 @app.get("/auth/{login}/{password}")
