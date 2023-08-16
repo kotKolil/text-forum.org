@@ -10,10 +10,20 @@ import sqlite3 as sql
 import sys
 import pathlib
 script_path = pathlib.Path(sys.argv[0]).parent  # абсолютный путь до каталога, где лежит скрипт
-
+import string 
+import random
 
 #создаём объект приложения
 app = FastAPI()
+
+#генератор индефикаторов сессии
+def gri():
+	#unique indeficator of session
+	uis = " "
+	symbols = string.ascii_uppercase
+	for i in range(random.randint(5,10)):
+		uis += random.choice(symbols)
+	return uis
 
 
 
