@@ -1,0 +1,5 @@
+http туннелирование:
+
+установить токен: $  ngrok config add-authtoken <токен>
+старт:
+ngrok http 8000

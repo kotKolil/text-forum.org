@@ -1,0 +1,51 @@
+  #red {
+    color: #00A00C;
+  }
+  #threads {
+    position: fixed;
+    width: 70%; 
+  }
+  #litera {
+    color: red;
+  }
+  #menu {
+    position: absolute;
+    right: 50px;
+    border-left: dashed 4px;
+    top: 90px;
+  }
+  #report {
+    position: fixed;
+    bottom: 0;
+    border: 1px solid;
+  }
+  #hide {
+    display: none;
+  }
+#menu2_come_back {
+  position:fixed;
+  left:30%;
+  top:30%;
+  width: 20%;
+  height : 30%;
+  border: 1px solid;
+}
+#center {
+  align:center;
+
+}
+ .red{
+  color:red;
+}
+
+#message {
+
+height : auto;
+overflow-y: auto; 
+
+}
+#mess_block {
+  padding: 12px;
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+}
