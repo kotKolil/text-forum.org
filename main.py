@@ -12,6 +12,9 @@ import pathlib
 script_path = pathlib.Path(sys.argv[0]).parent  # абсолютный путь до каталога, где лежит скрипт
 import string 
 import random
+import time
+import datetime
+
 
 #создаём объект приложения
 app = FastAPI()
@@ -26,7 +29,9 @@ app.mount("/static/", StaticFiles(directory="pages"))
 app.mount("/js/", StaticFiles(directory="js"))
 app.mount("/css/", StaticFiles(directory="css"))
 
-
+def gcd():
+    current_datetime = datetime.datetime.now()
+    return current_datetime.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
 def info_users():
 	# Подключение к базе данных
@@ -89,33 +94,32 @@ def main(session : str | None = Cookie(default=None)):
 
 @app.get("/logins")
 def logins():
-	logins = {"petya123"}
+	data = info_users()
+	logins = []
+	for i in data:
+		logins.append(i[0])
 	return logins
 		
+
 @app.get("/registrate/{login}/{password}")
 def reg(login, password):
-    data = info_users()
-    for i in range(len(data)):
-        if data[i][0] == login:
-            return {"403": "такой пользователь уже существует"}
-    
-    ids = gri()
-    for i in range(len(data)):
-        if data[i][3] == ids:
-            ids = gri()
-    
-    conn = sql.connect('db.db', timeout=7)
-    cursor = conn.cursor()
-    expression = """INSERT INTO users (USERNAME, PSWD, IPS) VALUES (?, ?, ?)"""
-    params = (login, password, ids)
-    
-    # Выполнение INSERT запроса
-    cursor.execute(expression, params)
-    conn.commit()
+	data = info_users()
+	for i in data:
+		if i[0] == login:
+			return {"403":"уже есть"}
+	ids = gri()
+	for i in data:
+		if i[3] == ids:
+			ids = gri()
 
-    # Закрытие соединения с базой данных
-    conn.close()
-    return ["200",ids]
+	conn = sql.connect('db.db', timeout=7)
+	cursor = conn.cursor()
+	expression = """INSERT INTO users (USERNAME, PSWD, IPS) VALUES (?, ?, ?)"""
+	params = (login, password, ids)
+	cursor.execute(expression, params)
+	conn.commit()
+	conn.close()
+	return ["200",ids]
 
 #аунтефикация
 @app.get("/auth/{login}/{password}")
@@ -125,7 +129,7 @@ def auth(password, login):
 		for i in data:
 			if i[0] == login and i[len(i)-1] == password:
 				#возращаем код сессии юзера
-				return {"code":"em3mie"}
+				return {"code":i[3].split(",")[0]}
 			else:
 				return {"code":"403"}
 	except Exception as e:
@@ -167,6 +171,17 @@ def ch_ses(ids):
 		if data[i][3].split(",")[0] == ids:
 			return {data[i][0]:data[i][3].split(",")[0]}
 	return ["404"]
-@app.get("/send_message/{user}/{message}")
-def send(user, message):
-	pass   
+@app.get("/send_message/{user}/{message}/{thd}")
+def send(user, message, thd):
+	data = info_users()
+	for i in data:
+		if i[0] == user:
+			conn = sql.connect('db.db', timeout=7)
+			cursor = conn.cursor()
+			expression = f"""INSERT INTO {thd} (sender, message, time) VALUES (?, ?, ?)"""
+			params = (user, message, gcd())
+			cursor.execute(expression, params)
+			conn.commit()
+			conn.close()
+			return [200]
+	return [403] 
