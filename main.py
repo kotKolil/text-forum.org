@@ -115,7 +115,7 @@ def reg(login, password):
 
     # Закрытие соединения с базой данных
     conn.close()
-    return {"200": ids}
+    return ["200",ids]
 
 #аунтефикация
 @app.get("/auth/{login}/{password}")

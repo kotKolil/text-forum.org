@@ -82,14 +82,16 @@ async function get() {
         const authResponse = await fetch(`/auth/${login.value}/${password.value}`);
         const authResult = await authResponse.json();
 
+
         console.log(authResult);
+        
         if (authResult[0] == "403") {
           status.style.color = "red";
           status.innerHTML = "Этот ник занят";
         }
         else {
-          setCookie("session", authResult[0], 666);
-          window.location.replace("/");
+          setCookie("session", authResult[1], 666);
+          //window.location.replace("/");
         }
 
       }
@@ -101,7 +103,7 @@ async function get() {
       const authResult = await authResponse.json();
       console.log(authResult);
       if (authResult["code"] != "403") {
-        setCookie("session", "em3mie",100)
+        setCookie("session", "em3mie",100);
         window.location.replace('/');
       } else {
         console.error('Ошибка:', authResult);
