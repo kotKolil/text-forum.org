@@ -156,11 +156,10 @@ async function ctt (ids) {
   const block = document.getElementById("mess")
 
   var ids = url.split("/")
-  console.log(ids[ids.length-1])
 
   var response = await fetch(`/mess/${ids[ids.length-1]}`);
   var data = await response.json();
-  console.log(data);
+
 
 
   var old = "";
@@ -192,22 +191,39 @@ function home() {
 window.location.replace("/");
 };
 
+
 async function send_message() {
+  let url = window.location.href;
+
+  url = url.split("/");
+  url = url[url.length-1]
+
+  var textarea = document.getElementById("input")
   var input = document.getElementById("input").value;
+  var ine = document.getElementById("in")
   console.log(input);
 
   var ids = getCookieValue("session");
   console.log(ids);
   
-  var response = await fetch(`/session_check/${ids}`);
+  let response = await fetch(`/session_check/${ids}`);
   response = await response.json();
   console.log(response);
-  
+
+  console.log(`/send_message/${response[0]}/${input}/${url}/${getCookieValue("session")}`);
+
+
+  if (textarea.value == "") {
+    ine.innerHTML = "ваше сообщение не должно быть пустым";
+
+  } 
+
   if (response[0] === 404) {
     window.location.replace("/");
   } else {
-    await fetch(`/send_message/${response[0]}/${response[1]}`);
-    console.log("отправка");
+    await fetch(`/send_message/${response[0]}/${input}/${url}/${getCookieValue("session")}`);
+    textarea.value = "";
+    
   }
 }
 

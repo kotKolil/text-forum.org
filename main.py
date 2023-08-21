@@ -169,13 +169,13 @@ def ch_ses(ids):
 	data = info_users()
 	for i in range(len(data)):
 		if data[i][3].split(",")[0] == ids:
-			return {data[i][0]:data[i][3].split(",")[0]}
+			return [data[i][0],data[i][3].split(",")[0]]
 	return ["404"]
-@app.get("/send_message/{user}/{message}/{thd}")
-def send(user, message, thd):
+@app.get("/send_message/{user}/{message}/{thd}/{session}")
+def send(user, message, thd, session):
 	data = info_users()
 	for i in data:
-		if i[0] == user:
+		if i[0] == user and i[3].split(",")[0] == session:
 			conn = sql.connect('db.db', timeout=7)
 			cursor = conn.cursor()
 			expression = f"""INSERT INTO {thd} (sender, message, time) VALUES (?, ?, ?)"""
