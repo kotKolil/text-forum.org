@@ -117,36 +117,6 @@ async function get() {
 
 
 
-//this funktion change main page to thread! It is awesome!
-async function ctt (ids) {
-
-
-  const response = await fetch(`/mbi/${ids}`)
-  const data = await response.json();
-
-    for (let i = 0 ; i < data.length-1; i++ ) {
-    var arr = list[i]
-    console.log(arr[0]);
-    console.log(arr[1]);
-    div.innerHTML = div.innerHTML + `
-    <div>
-    <span>
-
-    <strong>
-
-    
-
-    </strong>
-
-    </span>
-
-
-    </div>
-
-    `
-  }
-}
-
 
 
  async function get_msg() {
@@ -166,12 +136,31 @@ async function ctt (ids) {
   for (var i = 0; i < data.length; i++) {
 
     old += `
-      <div id="mess_block">
-        <strong>${data[i][0]} в ${data[i][2]}</strong>
-        <div id="message"> 
-          ${data[i][1]}
-        </div>
-      </div>
+
+
+<table>
+  <tr>
+    <th style="background-color: #ccc; width:  40px;">
+
+
+<div id="mess_block">
+  <div>
+    <p>${data[i][0]}</p>
+    <p>${data[i][2]}</p>
+  </div>
+
+
+    </th>
+    <th style="vertical-align:top; padding-top:5px;>   <span id="message">
+    ${data[i][1]}
+    </span>
+    </th>
+  </tr>
+</table>
+
+
+
+</div>
     `;
   }
   if (old !== block.innerHTML) {
