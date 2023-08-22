@@ -89,7 +89,6 @@ async function get() {
   //получение элементов формы
   const login = document.getElementById('login');
   const password = document.getElementById('password');
-  const email = document.getElementById("email");
   const status = document.getElementById("error");
   const method = document.getElementById("action");
 
@@ -132,8 +131,8 @@ async function get() {
       const authResponse = await fetch(`/auth/${login.value}/${password.value}`);
       const authResult = await authResponse.json();
       console.log(authResult);
-      if (authResult["code"] != "403") {
-        setCookie("session", "em3mie",100);
+      if (authResult[0] != "403") {
+        setCookie("session", authResult[1] ,666);
         window.location.replace('/');
       } else {
         console.error('Ошибка:', authResult);
@@ -259,8 +258,6 @@ async function crt_thd() {
   window.location.replace("/")
 
 }
-
-
 
 
 

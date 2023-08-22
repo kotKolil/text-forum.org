@@ -128,11 +128,11 @@ def auth(password, login):
 	data = info_users()
 	try:
 		for i in data:
-			if i[0] == login and i[len(i)-1] == password:
+			if i[0] == login and i[len(i)-2] == password:
 				#возращаем код сессии юзера
-				return {"code":i[3].split(",")[0]}
+				return ["200" , i[3].split(",")[0]]
 			else:
-				return {"code":"403"}
+				return ["403"]
 	except Exception as e:
 		return {"4f":e}
 

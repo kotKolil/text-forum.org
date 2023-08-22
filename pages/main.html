@@ -8,6 +8,7 @@
 <link  rel="stylesheet" href="/css/main.css">
 </head>
 </body>
+<script src="https://www.google.com/recaptcha/api.js"></script>
 <h2><span id="litera">T</span>ext-forum.org</h2>
 <p id="red">Минималистичный анонимный форум на любые темы</p>
 <hr>
@@ -30,7 +31,15 @@
 
 <strong id="text">Crete you thread!</strong>
 <p>Theme of you thread</p>
-<input id="theme"></input>
+<input id="theme" list="themes" placeholder="Выберите тему">
+<datalist id="themes">
+  <option value="Политика">
+  <option value="Спорт">
+  <option value="Искусство">
+  <option value="Наука">
+  <option value="Музыка">
+  <option value="Срач">
+</datalist>
 <button onclick="crt_thd();">Создать</button> 
 </div>
 
