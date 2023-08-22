@@ -213,7 +213,7 @@ window.location.replace("/");
 
 
 async function send_message() {
-  let url = window.location.href;
+  var url = window.location.href;
 
   url = url.split("/");
   url = url[url.length-1]
@@ -226,9 +226,11 @@ async function send_message() {
   var ids = getCookieValue("session");
   console.log(ids);
   
-  let response = await fetch(`/session_check/${ids}`);
+  var response = await fetch(`/session_check/${ids}`);
   response = await response.json();
   console.log(response);
+
+  data = [response[0] , input , url ,getCookieValue("session")]
 
   console.log(`/send_message/${response[0]}/${input}/${url}/${getCookieValue("session")}`);
 
@@ -241,7 +243,17 @@ async function send_message() {
   if (response[0] === 404) {
     window.location.replace("/");
   } else {
-    await fetch(`/send_message/${response[0]}/${input}/${url}/${getCookieValue("session")}`);
+
+
+  const response = await fetch("send_message", {
+    method: 'POST', // или 'PUT'
+    body: JSON.stringify(data), 
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+    //await fetch(`/send_message/${response[0]}/${input}/${url}/${getCookieValue("session")}`);
     textarea.value = "";
     
   }

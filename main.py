@@ -48,6 +48,7 @@ def info_users():
 
 	return data
 
+#Generate random Id
 def gri():
 	#unique indeficator of session
 	uis = " "
@@ -172,6 +173,8 @@ def ch_ses(ids):
 		if data[i][3].split(",")[0] == ids:
 			return [data[i][0],data[i][3].split(",")[0]]
 	return ["404"]
+"""
+#plan B for sending messages
 @app.get("/send_message/{user}/{message}/{thd}/{session}")
 def send(user, message, thd, session):
 	data = info_users()
@@ -179,14 +182,14 @@ def send(user, message, thd, session):
 		if i[0] == user and i[3].split(",")[0] == session:
 			conn = sql.connect('db.db', timeout=7)
 			cursor = conn.cursor()
-			expression = f"""INSERT INTO {thd} (sender, message, time) VALUES (?, ?, ?)"""
+			expression = f'INSERT INTO {thd} (sender, message, time) VALUES (?, ?, ?)'
 			params = (user, message, gcd())
 			cursor.execute(expression, params)
 			conn.commit()
 			conn.close()
 			return [200]
 	return [403] 
-
+"""
 
 @app.get("/crt_thd/{session}/{theme}")
 def crt_thd(session, theme):
@@ -222,4 +225,24 @@ CREATE TABLE {ids} (
 			return ["200"]
 	return ["403"]
 
+
+@app.post("/send_message")
+def sm(request : Request):
+	#json must looks as {user}/{message}/{thd}/{session}
+	data = request.json()
+	user = json[0]
+	message = json[1]
+	thd = json[2]
+	session = json[3]
+	for i in data:
+		if i[0] == user and i[3].split(",")[0] == session:
+			conn = sql.connect('db.db', timeout=7)
+			cursor = conn.cursor()
+			expression = f"""INSERT INTO {thd} (sender, message, time) VALUES (?, ?, ?)"""
+			params = (user, message, gcd())
+			cursor.execute(expression, params)
+			conn.commit()
+			conn.close()
+			return [200]
+	return [403] 
 
