@@ -1,5 +1,16 @@
 //функция для регистрации/входа
 // Функция для установки куки
+
+
+function sleep(seconds) {
+  const ms = seconds * 1000;
+  const start = new Date().getTime();
+  let currentTime = null;
+  do {
+    currentTime = new Date().getTime();
+  } while (currentTime - start < ms);
+}
+
 function setCookie(name, value, days) {
   const date = new Date();
   date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -10,21 +21,27 @@ function setCookie(name, value, days) {
 //funktion about coockie-file
 function hide() {
 
+
   dib = document.getElementById('report');
   dib.id = "hide";
   document.cookie = "cook" + "=" + "1"+ ";";
   document.cookie = "cook" + "=" + "1"+ ";";
+  setCookie("cook", "1", 666);
 }
 
 async function get_threads () {
   const div = document.getElementById("thd");
   const rezultat = await fetch("/threads/1");
   let list = await rezultat.json();
+  var news = "";
   for (let i = 0 ; i < list.length; i++ ) {
     var arr = list[i];
-    div.innerHTML = div.innerHTML + 
+    news = news + 
       `<div><strong>тема : ${arr[1]}</strong> <p> за авторством ${arr[0]}</p>
       <button onclick="window.location.replace('thd/${arr[3]}');">тык для перехода</button></div>`;
+  }
+  if (news !== div.innerHTML) {
+    div.innerHTML = news;
   }
 }
 
@@ -50,6 +67,19 @@ function getCookieValue(cookieName) {
     }
 
     return cookieValue;
+}
+
+function cc() {
+  try {
+    var f = getCookieValue("cook");
+    if (f == "1"){
+      console.log("братиша я тебе покушать принёс...");
+      hide();
+    }
+  }
+  catch (err) {
+    console.log(err);
+  }
 }
 
 
@@ -229,15 +259,6 @@ async function crt_thd() {
   window.location.replace("/")
 
 }
-
-
-
-
-
-
-
-
-
 
 
 
