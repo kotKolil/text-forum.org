@@ -28,6 +28,7 @@ app = FastAPI()
 app.mount("/static/", StaticFiles(directory="pages"))
 app.mount("/js/", StaticFiles(directory="js"))
 app.mount("/css/", StaticFiles(directory="css"))
+app.mount("/icons", StaticFiles(directory="icons"))
 
 def gcd():
     current_datetime = datetime.datetime.now()
@@ -185,3 +186,38 @@ def send(user, message, thd, session):
 			conn.close()
 			return [200]
 	return [403] 
+
+
+@app.get("/crt_thd/{session}/{theme}")
+def crt_thd(session, theme):
+	data = info_users()
+	for i in data:
+		if i[3].split(",")[0] == session:
+			ids = i[0]+theme+str(random.choice(range(1000,100000)))
+
+			#вносим в таблицу информацию о создающемся треде
+			conn = sql.connect('db.db', timeout=7)
+			cursor = conn.cursor()
+			expression = f"""INSERT INTO THD (CREATOR , THEM , TIME_CREATING , id) VALUES (?, ?, ?, ?)"""
+			params = (i[0], theme, gcd() , ids)
+			cursor.execute(expression, params)
+			conn.commit()
+			conn.close()
+
+
+			#создаём таблицу для треда
+			conn = sql.connect('db.db', timeout=7)
+			cursor = conn.cursor()
+			expression = f"""
+CREATE TABLE {ids} (
+	"sender"	TEXT,
+	"message"	TEXT,
+	"time"	TEXT
+);
+			"""
+			cursor.execute(expression)
+			conn.commit()
+			conn.close()
+
+			return ["200"]
+	return ["403"]

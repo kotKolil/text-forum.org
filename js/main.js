@@ -121,7 +121,7 @@ async function get() {
 
  async function get_msg() {
   const url = window.location.href;
-  console.log(url);
+
 
   const block = document.getElementById("mess")
 
@@ -130,10 +130,12 @@ async function get() {
   var response = await fetch(`/mess/${ids[ids.length-1]}`);
   var data = await response.json();
 
+  
 
 
   var old = "";
   for (var i = 0; i < data.length; i++) {
+
 
     old += `
 
@@ -217,19 +219,16 @@ async function send_message() {
 }
 
 
+async function crt_thd() {
+  var theme = document.getElementById("theme").value;
+  var text = document.getElementById("text");
+  var session = getCookieValue("session");
 
+  //отправка на сервер
+  var response  = await fetch(`/crt_thd/${session}/${theme}`);
+  window.location.replace("/")
 
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 
