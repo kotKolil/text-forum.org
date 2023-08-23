@@ -131,11 +131,13 @@ def auth(password, login):
 		for i in data:
 			if i[0] == login and i[len(i)-2] == password:
 				#возращаем код сессии юзера
-				return ["200" , i[3].split(",")[0]]
+				return ["200" , i[3]]
 			else:
-				return ["403"]
+				return ["403"]   
 	except Exception as e:
 		return {"4f":e}
+
+
 
 @app.get("/threads/{a}")
 def threads(a: str):  # добавляем аннотацию типа данных
@@ -170,8 +172,8 @@ def huy(ids):
 def ch_ses(ids):
 	data = info_users()
 	for i in range(len(data)):
-		if data[i][3].split(",")[0] == ids:
-			return [data[i][0],data[i][3].split(",")[0]]
+		if data[i][3] == ids:
+			return [data[i][0],data[i][3]]
 	return ["404"]
 """
 #plan B for sending messages
@@ -195,7 +197,7 @@ def send(user, message, thd, session):
 def crt_thd(session, theme):
 	data = info_users()
 	for i in data:
-		if i[3].split(",")[0] == session:
+		if i[3] == session:
 			ids = i[0]+theme+str(random.choice(range(1000,100000)))
 
 			#вносим в таблицу информацию о создающемся треде
@@ -237,7 +239,7 @@ async def sm(request: Request):
     thd = js[2]
     session = js[3]
     for i in data:
-        if i[0] == user and i[3][:-1] == session:
+        if i[0] == user and i[3] == session:
             conn = sql.connect('db.db')
             expression = f"""INSERT INTO {thd} (sender, message, time) VALUES ('{user}', '{message}', '{gcd()}')"""
             conn.execute(expression)
