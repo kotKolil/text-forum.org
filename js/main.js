@@ -232,7 +232,6 @@ async function send_message() {
 
   data = [response[0] , input , url ,getCookieValue("session")]
 
-  console.log(`/send_message/${response[0]}/${input}/${url}/${getCookieValue("session")}`);
 
 
   if (textarea.value == "") {
@@ -244,19 +243,21 @@ async function send_message() {
     window.location.replace("/");
   } else {
 
+  console.log(data);
 
-  const response = await fetch("send_message", {
+  var response = await fetch("/send_message", {
     method: 'POST', // или 'PUT'
     body: JSON.stringify(data), 
-    headers: {
-      'Content-Type': 'application/json'
-    }
   });
 
     //await fetch(`/send_message/${response[0]}/${input}/${url}/${getCookieValue("session")}`);
     textarea.value = "";
     
   }
+    response = await response.json();
+
+    console.log(response);
+
 }
 
 

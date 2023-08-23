@@ -227,22 +227,22 @@ CREATE TABLE {ids} (
 
 
 @app.post("/send_message")
-def sm(request : Request):
-	#json must looks as {user}/{message}/{thd}/{session}
-	data = request.json()
-	user = json[0]
-	message = json[1]
-	thd = json[2]
-	session = json[3]
-	for i in data:
-		if i[0] == user and i[3].split(",")[0] == session:
-			conn = sql.connect('db.db', timeout=7)
-			cursor = conn.cursor()
-			expression = f"""INSERT INTO {thd} (sender, message, time) VALUES (?, ?, ?)"""
-			params = (user, message, gcd())
-			cursor.execute(expression, params)
-			conn.commit()
-			conn.close()
-			return [200]
-	return [403] 
+async def sm(request: Request):
+    # json must looks as {user}/{message}/{thd}/{session}
+
+    data = info_users()
+    js = await request.json()
+    user = js[0]
+    message = js[1]
+    thd = js[2]
+    session = js[3]
+    for i in data:
+        if i[0] == user and i[3][:-1] == session:
+            conn = sql.connect('db.db')
+            expression = f"""INSERT INTO {thd} (sender, message, time) VALUES ('{user}', '{message}', '{gcd()}')"""
+            conn.execute(expression)
+            conn.commit()
+            conn.close()
+            return [200]
+    return [403]
 
