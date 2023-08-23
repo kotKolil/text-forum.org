@@ -28,7 +28,6 @@ app = FastAPI()
 app.mount("/static/", StaticFiles(directory="pages"))
 app.mount("/js/", StaticFiles(directory="js"))
 app.mount("/css/", StaticFiles(directory="css"))
-app.mount("/icons", StaticFiles(directory="icons"))
 
 def gcd():
     current_datetime = datetime.datetime.now()
@@ -40,7 +39,7 @@ def info_users():
 	cursor = conn.cursor()
 
 	# Выполнение SELECT запроса
-	cursor.execute("SELECT * FROM users")
+	cursor.execute("SELECT * FROM users") 
 	data = cursor.fetchall()  # Получение всех строк результата запрос
 
 	# Закрытие соединения с базой данных
@@ -248,3 +247,7 @@ async def sm(request: Request):
             return [200]
     return [403]
 
+
+@app.get("/FAQ")
+def FAQ():
+	return FileResponse("pages/faq.html")
