@@ -14,6 +14,7 @@ import string
 import random
 import time
 import datetime
+import requests as r
 
 
 #создаём объект приложения
@@ -51,7 +52,7 @@ def info_users():
 def gri():
 	#unique indeficator of session
 	uis = " "
-	symbols = string.ascii_lowercase + "1234567890~!@#$%^&*())_{}:<>??"
+	symbols = "1234567890qwertyuiopasdfghjklzxcvbnm"
 	for i in range(random.randint(5,10)):
 		uis += random.choice(symbols)
 	return uis
@@ -73,18 +74,13 @@ def list_thd():
 
 
 @app.get("/")
-def main(session : str | None = Cookie(default=None)):
-
-	
+def main(session: str = Cookie(None)):
     data = info_users()
-
     for i in data:
-    	ses = i[3]
-    	ses = ses.split(",")
-    	for h in ses:
-    		if h == session:
-	            response = FileResponse("pages/main.html")
-	            return response
+        ses = i[1][1:]
+        if ses == session:
+            response = FileResponse("pages/main.html")
+            return response
     response = FileResponse("pages/account.html")
     return response
     
@@ -107,10 +103,10 @@ def reg(login, password):
 	data = info_users()
 	for i in data:
 		if i[0] == login:
-			return {"403":"уже есть"}
+			return ["403"]
 	ids = gri()
 	for i in data:
-		if i[3] == ids:
+		if i[1] == ids:
 			ids = gri()
 
 	conn = sql.connect('db.db', timeout=7)
@@ -120,7 +116,7 @@ def reg(login, password):
 	cursor.execute(expression, params)
 	conn.commit()
 	conn.close()
-	return ["200",ids]
+	return [ids]
 
 #аунтефикация
 @app.get("/auth/{login}/{password}")
@@ -128,9 +124,9 @@ def auth(password, login):
 	data = info_users()
 	try:
 		for i in data:
-			if i[0] == login and i[len(i)-2] == password:
+			if i[0] == login and i[2] == password:
 				#возращаем код сессии юзера
-				return ["200" , i[3]]
+				return ["200" , i[1]]
 			else:
 				return ["403"]   
 	except Exception as e:
@@ -170,9 +166,9 @@ def huy(ids):
 @app.get("/session_check/{ids}")
 def ch_ses(ids):
 	data = info_users()
-	for i in range(len(data)):
-		if data[i][3] == ids:
-			return [data[i][0],data[i][3]]
+	for i in data:
+		if i[1][1:] == ids:
+			return [i[0],ids]
 	return ["404"]
 """
 #plan B for sending messages
@@ -196,7 +192,7 @@ def send(user, message, thd, session):
 def crt_thd(session, theme):
 	data = info_users()
 	for i in data:
-		if i[3] == session:
+		if i[1][1:] == session:
 			ids = i[0]+theme+str(random.choice(range(1000,100000)))
 
 			#вносим в таблицу информацию о создающемся треде
@@ -238,7 +234,7 @@ async def sm(request: Request):
     thd = js[2]
     session = js[3]
     for i in data:
-        if i[0] == user and i[3] == session:
+        if i[0] == user and i[1][1:] == session:
             conn = sql.connect('db.db')
             expression = f"""INSERT INTO {thd} (sender, message, time) VALUES ('{user}', '{message}', '{gcd()}')"""
             conn.execute(expression)
@@ -249,5 +245,16 @@ async def sm(request: Request):
 
 
 @app.get("/FAQ")
-def FAQ():
-	return FileResponse("pages/faq.html")
+def FAQ(request : Request):
+	ip = request.client.host
+	if ip == "127.0.0.1":
+		return HTMLResponse('Какой же ты не умный человек)))')
+	else:
+		try:
+			g = r.get("http://ipwho.is/{ip}")
+			if g.json()["country"] == "Russia":
+				return FileResponse("pages/faqRU.html")
+			else:
+				return FileResponse("pages/faqEN.html")
+		except:
+			return FileResponse("pages/faqEN.html")

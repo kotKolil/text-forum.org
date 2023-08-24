@@ -5,55 +5,20 @@
 <link  rel="stylesheet" href="/css/main.css">
 </head>
 </body>
-<script src="https://www.google.com/recaptcha/api.js"></script>
 <h2><span id="litera">T</span>ext-forum.org</h2>
 <p id="red">Минималистичный анонимный форум на любые темы</p>
 <hr>
 
-<p align="center">
+<div id="futter">
+
+
+			<a href="/">Главная</a>
+			<hr>
+			<a href="/FAQ">ЧаВо сайта</a>
 
 
 
-
-This repository contains files for the <strong>Text Forum</strong> server. This project is open-source. 
-The backend is built on the <strong>Fast API</strong> library using the <strong>Python 3.11.4</strong> programming language. The frontend is written in <strong>HTML 5</strong>, <strong>CSS 3</strong>, and pure <strong>JavaScript</strong>. The database runs on the <strong>sqlite3</strong> technology.
-This forum has its own API for creating client applications targeted for various platforms.
-
-
-Instructions for starting the server:
-<ol>
-  <li>System requirements required: Windows</li>
-  <li>Open the command prompt</li>
-  <li>Go to the <code>venv/Scripts</code> folder</li>
-  <li>Run <code>activate.bat</code></li>
-  <li>Go back to the Forum folder</li>
-  <li>Write the following command: <code>uvicorn main:app --reload</code></li>
-</ol>
-
-Installing libraries for server operation:
-<ol>
-  <li>Open the Command Prompt</li>
-  <li>Go to the Forum folder</li>
-  <li>Make sure that there is an Internet connection</li>
-  <li>Run: <code>pip install -r requirements.txt</code></li>
-</ol>
-
-
-List of URLs to access the API:
-<ul>
-  <li><code>http://{server_domain}/logins</code> - returns a list of user logins</li>
-  <li><code>http://{server_domain}/registrate/{login}/{password}</code> - registers a new user</li>
-  <li><code>http://{server_domain}/auth/{login}/{password}</code> - authenticates the user and returns the session code</li>
-  <li><code>http://{server_domain}/threads/1</code> - returns a list of threads created by users on the forum</li>
-  <li><code>http://{server_domain}/mess/{thread_id}</code> - returns information about the messages in the thread with the provided ID in the query string</li>
-  <li><code>http://{server_domain}/session_check/{session_code}</code> - checks if the session code exists and returns the username associated with the session token</li>
-</ul> 
-<li>http://{server domain}/threads/1 - returns a list of topics created by users on the forum</li>
-<li>http://{server domain}/mess/{topic id} - returns information about messages in the topic with the topic id passed in the query string </li>
-<li>http://{server domain}/session_check/{session code} - checks if the session code exists and returns the username associated with the session token</li>
-<li> <code> http://crt_thd /{session}/{theme}</code> - creating a thread. Session - user 's session code , theme - thread theme without !"№;%:?*(()~~` " </li>
-<li> <code> http://{domain}/send_message </code> - POST method for sending messages in thread; accepts json of the following type: <p> <code> {user}/{message}/{thread id}/{session of user} </code> </li>
-<hr>
+</div>
 
 Инструкция к запуску сервера:
 <ol>

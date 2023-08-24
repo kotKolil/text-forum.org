@@ -108,7 +108,7 @@ async function get() {
         console.log("регистрация");
 
         //отправка данных на проверку 
-        const authResponse = await fetch(`/auth/${login.value}/${password.value}`);
+        const authResponse = await fetch(`/registrate/${login.value}/${password.value}`);
         const authResult = await authResponse.json();
 
 
@@ -119,7 +119,7 @@ async function get() {
           status.innerHTML = "Этот ник занят";
         }
         else {
-          setCookie("session", authResult[1], 666);
+          setCookie("session", authResult[0], 666);
           //window.location.replace("/");
         }
 
