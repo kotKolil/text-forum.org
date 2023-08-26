@@ -5,11 +5,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse as htm
 from fastapi.responses import *
 from typing import Optional
-from fastapi import FastAPI, HTTPException
 import sqlite3 as sql
 import sys
 import pathlib
-script_path = pathlib.Path(sys.argv[0]).parent  # абсолютный путь до каталога, где лежит скрипт
 import string 
 import random
 import time
@@ -23,6 +21,8 @@ app = FastAPI()
 #генератор индефикаторов сессии
 
 
+#путь где лежит приложение
+script_path = pathlib.Path(sys.argv[0]).parent
 
 
 #добавляем статик файлы
@@ -30,23 +30,49 @@ app.mount("/static/", StaticFiles(directory="pages"))
 app.mount("/js/", StaticFiles(directory="js"))
 app.mount("/css/", StaticFiles(directory="css"))
 
-def gcd():
-    current_datetime = datetime.datetime.now()
-    return current_datetime.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+"""
+#middleware for ip
 
-def info_users():
-	# Подключение к базе данных
+@app.middleware("http")
+def ip_check(request : Request , call_next):
+	ip = request.client.host
+
 	conn = sql.connect('db.db')
 	cursor = conn.cursor()
 
 	# Выполнение SELECT запроса
-	cursor.execute("SELECT * FROM users") 
+	cursor.execute("SELECT IP FROM banned_ips") 
 	data = cursor.fetchall()  # Получение всех строк результата запрос
 
 	# Закрытие соединения с базой данных
 	conn.close()
 
-	return data
+	for i in data: 
+		if i == ip:
+			response = call_next(request)
+			request  
+	return call_next(request)
+
+"""
+
+	
+def  exccute(expression):
+	conn = sql.connect('db.db')
+	cursor = conn.cursor()
+
+	# Выполнение SELECT запроса
+	cursor.execute(expression)
+	data = cursor.fetchall()  # Получение всех строк результата запрос
+
+	# Закрытие соединения с базой данных
+	conn.close()
+
+	return 	data
+
+def gcd():
+    current_datetime = datetime.datetime.now()
+    return current_datetime.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+
 
 #Generate random Id
 def gri():
@@ -58,168 +84,114 @@ def gri():
 	return uis
 
 
-def list_thd():
-	# Подключение к базе данных
-	conn = sql.connect('db.db')
-	cursor = conn.cursor()
-
-	# Выполнение SELECT запроса
-	cursor.execute("SELECT * FROM  THD")
-	data = cursor.fetchall()  # Получение всех строк результата запрос
-
-	# Закрытие соединения с базой данных
-	conn.close()
-
-	return data
 
 
 @app.get("/")
 def main(session: str = Cookie(None)):
-    data = info_users()
-    for i in data:
-        ses = i[1][1:]
-        if ses == session:
-            response = FileResponse("pages/main.html")
-            return response
-    response = FileResponse("pages/account.html")
-    return response
     
+	data = exccute(f"SELECT * FROM users where IPS = ' {session}' ")
 
-
-
-
+	if len(data) != 0: return FileResponse("pages/main.html")
+	else: return FileResponse("pages/account.html")
 
 @app.get("/logins")
 def logins():
-	data = info_users()
-	logins = []
-	for i in data:
-		logins.append(i[0])
-	return logins
+	raw =  exccute("SELECT USERNAME FROM users ORDER BY USERNAME")
+	data = []
+	for i in raw: data.append(i[0])
+	return data
 		
 
 @app.get("/registrate/{login}/{password}")
 def reg(login, password):
-	data = info_users()
-	for i in data:
-		if i[0] == login:
-			return ["403"]
-	ids = gri()
-	for i in data:
-		if i[1] == ids:
-			ids = gri()
 
-	conn = sql.connect('db.db', timeout=7)
-	cursor = conn.cursor()
-	expression = """INSERT INTO users (USERNAME, PSWD, IPS) VALUES (?, ?, ?)"""
-	params = (login, password, ids)
-	cursor.execute(expression, params)
-	conn.commit()
-	conn.close()
-	return [ids]
+	raw =  exccute("SELECT USERNAME FROM users ORDER BY USERNAME")
+	data = []
+	for i in raw: data.append(i[0])
+
+	if login in data: return [403]
+
+	else:
+
+
+		ids = gri()
+		raw =  exccute("SELECT IPS FROM users ORDER BY USERNAME")
+		data = []
+		for i in raw: data.append(i[0])
+		if ids in data: ids = gri()
+
+		
+
+		conn = sql.connect('db.db', timeout=7)
+		cursor = conn.cursor()
+		expression = """INSERT INTO users (USERNAME, PSWD, IPS) VALUES (?, ?, ?)"""
+		params = (login, password, ids)
+		cursor.execute(expression, params)
+		conn.commit()
+		conn.close()
+		return [ids]
 
 #аунтефикация
 @app.get("/auth/{login}/{password}")
 def auth(password, login):
-	data = info_users()
-	try:
-		for i in data:
-			if i[0] == login and i[2] == password:
-				#возращаем код сессии юзера
-				return ["200" , i[1]]
-			else:
-				return ["403"]   
-	except Exception as e:
-		return {"4f":e}
+	data =  exccute(f"SELECT * FROM users where USERNAME =  '{login}' and PSWD = '{password}' ")
+	if len(data) == 0: return ["403"]
+	else: return ["200", data[0][1]]
 
 
 
-@app.get("/threads/{a}")
-def threads(a: str):  # добавляем аннотацию типа данных
-    if a == "1":
-    	return list_thd()
-    else:
-        raise HTTPException(
-            status_code=400,
-            detail="number not defined",
-            headers={"header": "400"},
-        )
+
+@app.get("/threads")
+def threads():
+    return exccute("SELECT * FROM  THD")
+
 @app.get("/thd/{d}")
 def thd(d):
 	return FileResponse("pages/thd.html")
 
 @app.get("/mess/{ids}")
 def huy(ids):
-
-	conn = sql.connect('db.db')
-	cursor = conn.cursor()
-
-	# Выполнение SELECT запроса
-	cursor.execute(f"SELECT * FROM  {ids}")
-	data = cursor.fetchall()  # Получение всех строк результата запрос
-
-	# Закрытие соединения с базой данных
-	conn.close()
-
-	return data
+	return exccute(f"SELECT * FROM  {ids}")
 
 @app.get("/session_check/{ids}")
 def ch_ses(ids):
-	data = info_users()
-	for i in data:
-		if i[1][1:] == ids:
-			return [i[0],ids]
-	return ["404"]
-"""
-#plan B for sending messages
-@app.get("/send_message/{user}/{message}/{thd}/{session}")
-def send(user, message, thd, session):
-	data = info_users()
-	for i in data:
-		if i[0] == user and i[3].split(",")[0] == session:
-			conn = sql.connect('db.db', timeout=7)
-			cursor = conn.cursor()
-			expression = f'INSERT INTO {thd} (sender, message, time) VALUES (?, ?, ?)'
-			params = (user, message, gcd())
-			cursor.execute(expression, params)
-			conn.commit()
-			conn.close()
-			return [200]
-	return [403] 
-"""
+	data = exccute(f"SELECT USERNAME , IPS FROM users where IPS = ' {ids}' ")
+	if len(data) == 0: return ["404"]
+	else: return [data[0][0] , ids]	
+
 
 @app.get("/crt_thd/{session}/{theme}")
 def crt_thd(session, theme):
-	data = info_users()
-	for i in data:
-		if i[1][1:] == session:
-			ids = i[0]+theme+str(random.choice(range(1000,100000)))
+	data = exccute(f"SELECT IPS FROM users where IPS = ' {session}'")
+	h = r.get(f"http://127.0.0.1:8000/session_check/ {session}").json()[0]
+	if len(data[0]) == 1: 
+		ids = h+theme+str(random.choice(range(1000,100000)))
 
-			#вносим в таблицу информацию о создающемся треде
-			conn = sql.connect('db.db', timeout=7)
-			cursor = conn.cursor()
-			expression = f"""INSERT INTO THD (CREATOR , THEM , TIME_CREATING , id) VALUES (?, ?, ?, ?)"""
-			params = (i[0], theme, gcd() , ids)
-			cursor.execute(expression, params)
-			conn.commit()
-			conn.close()
+		#вносим в таблицу информацию о создающемся треде
+		conn = sql.connect('db.db', timeout=7)
+		cursor = conn.cursor()
+		expression = f"""INSERT INTO THD (CREATOR , THEM , TIME_CREATING , id) VALUES (?, ?, ?, ?)"""
+		params = (h, theme, gcd() , ids)
+		cursor.execute(expression, params)
+		conn.commit()
+		conn.close()
 
 
-			#создаём таблицу для треда
-			conn = sql.connect('db.db', timeout=7)
-			cursor = conn.cursor()
-			expression = f"""
+		#создаём таблицу для треда
+		conn = sql.connect('db.db', timeout=7)
+		cursor = conn.cursor()
+		expression = f"""
 CREATE TABLE {ids} (
 	"sender"	TEXT,
 	"message"	TEXT,
 	"time"	TEXT
 );
 			"""
-			cursor.execute(expression)
-			conn.commit()
-			conn.close()
+		cursor.execute(expression)
+		conn.commit()
+		conn.close()
 
-			return ["200"]
+		return ["200"]
 	return ["403"]
 
 
@@ -227,7 +199,7 @@ CREATE TABLE {ids} (
 async def sm(request: Request):
     # json must looks as {user}/{message}/{thd}/{session}
 
-    data = info_users()
+    data = exccute("SELECT * FROM users")
     js = await request.json()
     user = js[0]
     message = js[1]

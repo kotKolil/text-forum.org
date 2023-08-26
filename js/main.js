@@ -31,7 +31,7 @@ function hide() {
 
 async function get_threads () {
   const div = document.getElementById("thd");
-  const rezultat = await fetch("/threads/1");
+  const rezultat = await fetch("/threads");
   let list = await rezultat.json();
   var news = "";
   for (let i = 0 ; i < list.length; i++ ) {
