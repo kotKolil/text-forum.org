@@ -1,7 +1,9 @@
+import sqlite3
 import sqlite3 as sql
 import sys
 import random
 import string
+import os
 import pathlib
 pathlib.Path(sys.argv[0]).parent  # абсолютный путь до каталога, где лежит скрипт
 
@@ -27,6 +29,28 @@ def gri():
 		uis += random.choice(symbols)
 	return uis
 
-print(info_users())
+
+def insert_filenames_to_db(path):
+    # Устанавливаем соединение с базой данных
+    conn = sqlite3.connect("db.db")
+    cursor = conn.cursor()
+
+    # Получаем список файлов без расширений из указанной папки
+    filenames = [os.path.splitext(file)[0] for file in os.listdir(path) if os.path.isfile(os.path.join(path, file))]
+    print(filenames)
+
+    # Вставляем имена файлов в колонку 'id' таблицы в базе данных
+    for filename in filenames:
+        cursor.execute(f"""INSERT INTO smiles (ids) VALUES ('{filename}')""")
+
+    # Сохраняем изменения
+    conn.commit()
+
+    # Закрываем соединение
+    conn.close()
+
+insert_filenames_to_db("C:/Forum/smiles", )
+
+
 
 

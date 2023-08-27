@@ -29,6 +29,9 @@ script_path = pathlib.Path(sys.argv[0]).parent
 app.mount("/static/", StaticFiles(directory="pages"))
 app.mount("/js/", StaticFiles(directory="js"))
 app.mount("/css/", StaticFiles(directory="css"))
+app.mount("/smiles/", StaticFiles(directory="smiles"))
+
+
 
 """
 #middleware for ip
@@ -191,6 +194,7 @@ CREATE TABLE {ids} (
 		conn.commit()
 		conn.close()
 
+
 		return ["200"]
 	return ["403"]
 
@@ -230,3 +234,7 @@ def FAQ(request : Request):
 				return FileResponse("pages/faqEN.html")
 		except:
 			return FileResponse("pages/faqEN.html")
+
+@app.get("/test")
+def test():
+	return htm("I am fine")
