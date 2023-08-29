@@ -166,9 +166,9 @@ def ch_ses(ids):
 @app.get("/crt_thd/{session}/{theme}")
 def crt_thd(session, theme):
 	data = exccute(f"SELECT IPS FROM users where IPS = ' {session}'")
-	h = r.get(f"http://127.0.0.1:8000/session_check/ {session}").json()[0]
+	h = r.get(f"http://127.0.0.1:8000/session_check/{session}").json()[0]
 	if len(data[0]) == 1: 
-		ids = h+theme+str(random.choice(range(1000,100000)))
+		ids = str(h)+theme+str(random.choice(range(1000,100000)))
 
 		#вносим в таблицу информацию о создающемся треде
 		conn = sql.connect('db.db', timeout=7)
@@ -195,8 +195,8 @@ CREATE TABLE {ids} (
 		conn.close()
 
 
-		return ["200"]
-	return ["403"]
+		return [200]
+	return [403]
 
 
 @app.post("/send_message")
@@ -212,7 +212,7 @@ async def sm(request: Request):
     for i in data:
         if i[0] == user and i[1][1:] == session:
             conn = sql.connect('db.db')
-            expression = f"""INSERT INTO {thd} (sender, message, time) VALUES ('{user}', '{message}', '{gcd()}')"""
+            expression = f"""INSERT INTO {thd} (sender, message, time) VALUES ('{user}' , '{message}', '{gcd}')"""
             conn.execute(expression)
             conn.commit()
             conn.close()
@@ -234,6 +234,28 @@ def FAQ(request : Request):
 				return FileResponse("pages/faqEN.html")
 		except:
 			return FileResponse("pages/faqEN.html")
+
+@app.get("/smile/{num}")
+def smiles(num:int):
+	if num == 0:
+		data = []
+		raw = exccute("SELECT * from smiles")
+		for i in raw: data.append(i[0])
+		return data
+	elif num == 1:
+		data = []
+		raw = exccute("SELECT * from smiles")
+		for i in raw: data.append(i[0])
+
+		html = """ """
+
+		for i in data:
+			html += f""" <img 
+			onclick="insert_to_message('{i}');"
+
+			src='http://127.0.0.1:8000/smiles/{i}.gif' />""" 
+
+		return [html]
 
 @app.get("/test")
 def test():

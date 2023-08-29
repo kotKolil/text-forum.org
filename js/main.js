@@ -230,7 +230,7 @@ async function send_message() {
   response = await response.json();
   console.log(response);
 
-  data = [response[0] , input , url ,getCookieValue("session")]
+  data = [response[0] , `${input}` , url ,getCookieValue("session")]
 
 
 
@@ -273,4 +273,34 @@ async function crt_thd() {
 }
 
 
+async function get_smiles() {
 
+  const response = await fetch("/smile/1");
+  var data = await response.json();
+  var html = data[0]
+  console.log(data);
+
+  var smileBlock = document.getElementById("smile");
+  smileBlock.innerHTML = html;
+}
+
+function copyToClipboard(text) {
+  const textarea = document.createElement('textarea');
+  
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+
+}
+
+function insert_to_message (ids) {
+  message_field = document.getElementById("input");
+  message_field.value = `<img src="http://127.0.0.1:8000/smiles/${ids}.gif" />` + message_field.value;
+
+
+
+}

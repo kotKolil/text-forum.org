@@ -24,6 +24,7 @@
   }
   #hide {
     display: none;
+    border: none;
   }
 #menu2_come_back {
   position:fixed;
@@ -80,3 +81,15 @@ overflow-y: auto;
   background: #BBBBBB;
   color: black;
 }
+
+
+
+#smile {
+  bottom: 0px;
+  left: 0px;
+  position: fixed;
+  border:  solid 5px;
+  width:50%;
+  height: 90px;
+  overflow-y: auto;
+} 
