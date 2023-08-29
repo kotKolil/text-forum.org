@@ -93,3 +93,9 @@ overflow-y: auto;
   height: 90px;
   overflow-y: auto;
 } 
+
+#answr {
+  color:#66FF00;
+  font-family: monospace;
+  
+}

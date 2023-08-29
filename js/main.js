@@ -165,8 +165,9 @@ async function get() {
   var old = "";
   for (var i = 0; i < data.length; i++) {
 
-
+//for deleting - 1 argument user, 2 argument - sender
     old += `
+
 
 
 <table>
@@ -186,6 +187,14 @@ async function get() {
     ${data[i][1]}
     </span>
     </th>
+  </tr>
+  <tr>
+  <th>
+  <button onclick='delete("${data[i][0]}",  "${data[i][2]}");' style="width:100%; height:100%;">Delete</button> 
+  </th>
+  <th>
+  <button onclick="answer('${data[i][0]}');" ,  style="width:100%; height:100%;" >Ответить</button>
+  </th>
   </tr>
 </table>
 
@@ -303,4 +312,15 @@ function insert_to_message (ids) {
 
 
 
-}
+ }
+
+
+
+function answer(ids) {
+  message_field = document.getElementById("input");
+  message_field.value = `<p id="answr">Answer to ${ids} </p>` + message_field.value;
+
+
+
+ }
+
