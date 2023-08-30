@@ -64,6 +64,28 @@ List of URLs to access the API:
 <li>http://{server domain}/session_check/{session code} - checks if the session code exists and returns the username associated with the session token</li>
 <li> <code> http://crt_thd /{session}/{theme}</code> - creating a thread. Session - user 's session code , theme - thread theme without !"№;%:?*(()~~` " </li>
 <li> <code> http://{domain}/send_message </code> - POST method for sending messages in thread; accepts json of the following type: <p> <code> {user}/{message}/{thread id}/{session of user} </code> </li>
+
+<H3>Application Testing</H3>
+
+To run the application test, write the following command:
+
+<code>sudo pytest -v test_app.py</code>
+
+
 <hr>
+
+<H3>Docker</H3>
+<p>For those who use Docker technologies, I have prepared a Dockerfile. To create a dockerfile, write this:</p>
+<code>sudo docker build -t Forum </code>
+<p>To run this container:</p>
+<code>sudo docker run -p 8080:8000 forum</code>
+
+
+<H3>Application Testing</H3>
+
+To run the application test, write the following command:
+
+<code>sudo pytest -v test_app.py</code>
+
 </body>
 </html>

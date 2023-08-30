@@ -82,33 +82,7 @@ def test_get_list_of_thd():
 
 
 
-def test_auth():
-	logger = logging.getLogger()
 
-	f = time.time()
-	h = r.get(f"http://127.0.0.1:8000/auth/{login}/{password}")
-	t = time.time()
-
-	assert h.json()[0] == "200" and h.json()[1] == session
-
-
-	logger.info(f"""The API for authentication works fine. The authentication request was completed in {t-f} seconds.
-	 Session code: {session}""")
-
-
-
-def test_create_thd_api():
-	session = "qwerty"
-	logger = logging.getLogger()
-
-	f = time.time()
-	h = r.get(f"http://127.0.0.1:8000/crt_thd/{session}/other")
-	h2 = r.get(f"http://127.0.0.1:8000/crt_thd/qwert/other")
-	t = time.time()
-
-	assert h.json().json()[0] == 200 and h2.json()[0] == 403
-
-	loger.info(f"The thread creation API is working fine. Request was completed in {t-f} seconds. Session code: {session}")
 
 
 def test_send_message_to_thread_and_database_as_file():

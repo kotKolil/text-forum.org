@@ -64,5 +64,18 @@ Backend создан на основе библиотеки <strong>Fast API</st
 
 
 </ul>
+<H3>Docker</H3>
+<p> Для тех, кто использует технологии Docker, я подготовил Dockerfile. Для создания dockerfile пропишите это:
+</p>
+<code>sudo docker build -t Forum </code>
+<p>Для запуска контейнера</p>
+<code>sudo docker run -p 8080:8000 forum</code>
+
+<H3>Тестинг приложения</H3>
+
+Чтобы запустить тест приложения пропишите следующую команду:
+
+<code>sudo pytest -v test_app.py</code>
+
 </body>
 </html>

@@ -33,6 +33,7 @@ app.mount("/smiles/", StaticFiles(directory="smiles"))
 
 
 
+
 """
 #middleware for ip
 
@@ -60,7 +61,7 @@ def ip_check(request : Request , call_next):
 
 	
 def  exccute(expression):
-	conn = sql.connect('db.db')
+	conn = sql.connect('db.db' , timeout=7)
 	cursor = conn.cursor()
 
 	# Выполнение SELECT запроса
@@ -91,7 +92,8 @@ def gri():
 
 @app.get("/")
 def main(session: str = Cookie(None)):
-    
+	
+
 	data = exccute(f"SELECT * FROM users where IPS = ' {session}' ")
 
 	if len(data) != 0: return FileResponse("pages/main.html")
@@ -107,7 +109,6 @@ def logins():
 
 @app.get("/registrate/{login}/{password}")
 def reg(login, password):
-
 	raw =  exccute("SELECT USERNAME FROM users ORDER BY USERNAME")
 	data = []
 	for i in raw: data.append(i[0])
@@ -137,6 +138,8 @@ def reg(login, password):
 #аунтефикация
 @app.get("/auth/{login}/{password}")
 def auth(password, login):
+	
+
 	data =  exccute(f"SELECT * FROM users where USERNAME =  '{login}' and PSWD = '{password}' ")
 	if len(data) == 0: return ["403"]
 	else: return ["200", data[0][1]]
@@ -146,7 +149,9 @@ def auth(password, login):
 
 @app.get("/threads")
 def threads():
-    return exccute("SELECT * FROM  THD")
+	
+	
+	return exccute("SELECT * FROM  THD")
 
 @app.get("/thd/{d}")
 def thd(d):
@@ -154,10 +159,14 @@ def thd(d):
 
 @app.get("/mess/{ids}")
 def huy(ids):
+	
+
 	return exccute(f"SELECT * FROM  {ids}")
 
 @app.get("/session_check/{ids}")
 def ch_ses(ids):
+	
+
 	data = exccute(f"SELECT USERNAME , IPS FROM users where IPS = ' {ids}' ")
 	if len(data) == 0: return ["404"]
 	else: return [data[0][0] , ids]	
@@ -165,6 +174,8 @@ def ch_ses(ids):
 
 @app.get("/crt_thd/{session}/{theme}")
 def crt_thd(session, theme):
+	
+
 	data = exccute(f"SELECT IPS FROM users where IPS = ' {session}'")
 	h = r.get(f"http://127.0.0.1:8000/session_check/{session}").json()[0]
 	if len(data[0]) == 1: 
@@ -200,28 +211,30 @@ CREATE TABLE {ids} (
 
 
 @app.post("/send_message")
-async def sm(request: Request):
-    # json must looks as {user}/{message}/{thd}/{session}
+def sm(request: Request):
+	# json must looks as {user}/{message}/{thd}/{session}
 
-    data = exccute("SELECT * FROM users")
-    js = await request.json()
-    user = js[0]
-    message = js[1]
-    thd = js[2]
-    session = js[3]
-    for i in data:
-        if i[0] == user and i[1][1:] == session:
-            conn = sql.connect('db.db')
-            expression = f"""INSERT INTO {thd} (sender, message, time) VALUES ('{user}' , '{message}', '{gcd}')"""
-            conn.execute(expression)
-            conn.commit()
-            conn.close()
-            return [200]
-    return [403]
+	data = exccute("SELECT * FROM users")
+	js =  request.json()
+	user = js[0]
+	message = js[1]
+	thd = js[2]
+	session = js[3]
+	for i in data:
+		if i[0] == user and i[1][1:] == session:
+			conn = sql.connect('db.db')
+			expression = f"""INSERT INTO {thd} (sender, message, time) VALUES ('{user}' , '{message}', '{gcd}')"""
+			conn.execute(expression)
+			conn.commit()
+			conn.close()
+			return [200]
+	return [403]
 
 
 @app.get("/FAQ")
 def FAQ(request : Request):
+	
+
 	ip = request.client.host
 	if ip == "127.0.0.1":
 		return HTMLResponse('Какой же ты не умный человек)))')
@@ -237,6 +250,8 @@ def FAQ(request : Request):
 
 @app.get("/smile/{num}")
 def smiles(num:int):
+	
+
 	if num == 0:
 		data = []
 		raw = exccute("SELECT * from smiles")
@@ -259,4 +274,6 @@ def smiles(num:int):
 
 @app.get("/test")
 def test():
+	
+
 	return htm("I am fine")

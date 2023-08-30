@@ -190,9 +190,6 @@ async function get() {
   </tr>
   <tr>
   <th>
-  <button onclick='delete("${data[i][0]}",  "${data[i][2]}");' style="width:100%; height:100%;">Delete</button> 
-  </th>
-  <th>
   <button onclick="answer('${data[i][0]}');" ,  style="width:100%; height:100%;" >Ответить</button>
   </th>
   </tr>
