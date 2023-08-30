@@ -45,6 +45,21 @@ List of URLs to access the API:
 <li>http://{server domain}/session_check/{session code} - checks if the session code exists and returns the username associated with the session token</li>
 <li> <code> http://crt_thd /{session}/{theme}</code> - creating a thread. Session - user 's session code , theme - thread theme without !"№;%:?*(()~~` " </li>
 <li> <code> http://{domain}/send_message </code> - POST method for sending messages in thread; accepts json of the following type: <p> <code> {user}/{message}/{thread id}/{session of user} </code> </li>
+
+
+<H3>Docker</H3>
+<p>For those who use Docker technologies, I have prepared a Dockerfile. To create a dockerfile, write this:</p>
+<code>sudo docker build -t Forum </code>
+<p>To run this container:</p>
+<code>sudo docker run -p 8080:8000 forum</code>
+
+
+<H3>Application Testing</H3>
+
+To run the application test, write the following command:
+
+<code>sudo pytest -v test_app.py</code>
+
 <hr>
 
 Инструкция к запуску сервера:
@@ -82,12 +97,23 @@ Backend создан на основе библиотеки <strong>Fast API</st
 <li> <code> http://crt_thd/{session}/{theme}</code> - создание треда. Session - код сесси пользователя , theme - тема треда без !"№;%:?*(()~~` " </li>
 <li> <code> http://{домен}/send_message </code> - POST метод; принимает json такоого вида: <p> <code> {user}/{message}/{thd id}/{session of thread} </code> </li>
 
-
-
-
-
-
-
-
-
 </ul>
+
+<H3>Docker</H3>
+<p> Для тех, кто использует технологии Docker, я подготовил Dockerfile. Для создания dockerfile пропишите это:
+</p>
+<code>sudo docker build -t Forum </code>
+<p>Для запуска контейнера</p>
+<code>sudo docker run -p 8080:8000 forum</code>
+
+
+<H3>Тестинг приложения</H3>
+
+Чтобы запустить тест приложения пропишите следующую команду:
+
+<code>sudo pytest -v test_app.py</code>
+
+
+
+
+

@@ -165,8 +165,9 @@ async function get() {
   var old = "";
   for (var i = 0; i < data.length; i++) {
 
-
+//for deleting - 1 argument user, 2 argument - sender
     old += `
+
 
 
 <table>
@@ -186,6 +187,11 @@ async function get() {
     ${data[i][1]}
     </span>
     </th>
+  </tr>
+  <tr>
+  <th>
+  <button onclick="answer('${data[i][0]}');" ,  style="width:100%; height:100%;" >Ответить</button>
+  </th>
   </tr>
 </table>
 
@@ -230,7 +236,7 @@ async function send_message() {
   response = await response.json();
   console.log(response);
 
-  data = [response[0] , input , url ,getCookieValue("session")]
+  data = [response[0] , `${input}` , url ,getCookieValue("session")]
 
 
 
@@ -273,4 +279,45 @@ async function crt_thd() {
 }
 
 
+async function get_smiles() {
+
+  const response = await fetch("/smile/1");
+  var data = await response.json();
+  var html = data[0]
+  console.log(data);
+
+  var smileBlock = document.getElementById("smile");
+  smileBlock.innerHTML = html;
+}
+
+function copyToClipboard(text) {
+  const textarea = document.createElement('textarea');
+  
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+
+}
+
+function insert_to_message (ids) {
+  message_field = document.getElementById("input");
+  message_field.value = `<img src="http://127.0.0.1:8000/smiles/${ids}.gif" />` + message_field.value;
+
+
+
+ }
+
+
+
+function answer(ids) {
+  message_field = document.getElementById("input");
+  message_field.value = `<p id="answr">Answer to ${ids} </p>` + message_field.value;
+
+
+
+ }
 
