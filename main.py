@@ -63,7 +63,8 @@ def ip_check(request : Request , call_next):
 	
 async def  exccute(expression):
 	async with aiosqlite.connect('db.db') as db:
-		await db.execute(expression)
+		cursor = await db.execute(expression)
+		data = await cursor.fetchall()
 		await db.commit()
 	return data
 
