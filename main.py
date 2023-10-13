@@ -62,7 +62,7 @@ def ip_check(request : Request , call_next):
 
 	
 async def  exccute(expression):
-	async with aiosqlite.connect('weather.db') as db:
+	async with aiosqlite.connect('db.db') as db:
 		await db.execute(expression)
 		await db.commit()
 	return data
