@@ -13,7 +13,8 @@ import random
 import time
 import datetime
 import requests as r
-
+import aiosqlite
+import asyncio
 
 #создаём объект приложения
 app = FastAPI()
@@ -60,18 +61,12 @@ def ip_check(request : Request , call_next):
 """
 
 	
-def  exccute(expression):
-	conn = sql.connect('db.db' , timeout=7)
-	cursor = conn.cursor()
+async def  exccute(expression):
+	async with aiosqlite.connect('weather.db') as db:
+		await db.execute(expression)
+		await db.commit()
 
-	# Выполнение SELECT запроса
-	cursor.execute(expression)
-	data = cursor.fetchall()  # Получение всех строк результата запрос
-
-	# Закрытие соединения с базой данных
-	conn.close()
-
-	return 	data
+	await return data
 
 def gcd():
     current_datetime = datetime.datetime.now()
@@ -91,25 +86,25 @@ def gri():
 
 
 @app.get("/")
-def main(session: str = Cookie(None)):
+async def main(session: str = Cookie(None)):
 	
 
-	data = exccute(f"SELECT * FROM users where IPS = ' {session}' ")
+	data = await  exccute(f"SELECT * FROM users where IPS = ' {session}' ")
 
 	if len(data) != 0: return FileResponse("pages/main.html")
 	else: return FileResponse("pages/account.html")
 
 @app.get("/logins")
-def logins():
-	raw =  exccute("SELECT USERNAME FROM users ORDER BY USERNAME")
+async def logins():
+	raw = await  exccute("SELECT USERNAME FROM users ORDER BY USERNAME")
 	data = []
 	for i in raw: data.append(i[0])
 	return data
 		
 
 @app.get("/registrate/{login}/{password}")
-def reg(login, password):
-	raw =  exccute("SELECT USERNAME FROM users ORDER BY USERNAME")
+async def reg(login, password):
+	raw = await  exccute("SELECT USERNAME FROM users ORDER BY USERNAME")
 	data = []
 	for i in raw: data.append(i[0])
 
@@ -137,10 +132,10 @@ def reg(login, password):
 
 #аунтефикация
 @app.get("/auth/{login}/{password}")
-def auth(password, login):
-	
+async def auth(password, login):
 
-	data =  exccute(f"SELECT * FROM users where USERNAME =  '{login}' and PSWD = '{password}' ")
+
+	data = await  exccute(f"SELECT * FROM users where USERNAME =  '{login}' and PSWD = '{password}' ")
 	if len(data) == 0: return ["403"]
 	else: return ["200", data[0][1]]
 
@@ -148,35 +143,37 @@ def auth(password, login):
 
 
 @app.get("/threads")
-def threads():
-	
-	
-	return exccute("SELECT * FROM  THD")
+async def threads():
+
+
+	h = await exccute("SELECT * FROM  THD")
+	return h
 
 @app.get("/thd/{d}")
 def thd(d):
 	return FileResponse("pages/thd.html")
 
 @app.get("/mess/{ids}")
-def huy(ids):
+async def huy(ids):
 	
 
-	return exccute(f"SELECT * FROM  {ids}")
+	h = await  exccute(f"SELECT * FROM  {ids}")
+	return h
 
 @app.get("/session_check/{ids}")
-def ch_ses(ids):
+async def ch_ses(ids):
 	
 
-	data = exccute(f"SELECT USERNAME , IPS FROM users where IPS = ' {ids}' ")
+	data = await  exccute(f"SELECT USERNAME , IPS FROM users where IPS = ' {ids}' ")
 	if len(data) == 0: return ["404"]
 	else: return [data[0][0] , ids]	
 
 
 @app.get("/crt_thd/{session}/{theme}")
-def crt_thd(session, theme):
+async def crt_thd(session, theme):
 	
 
-	data = exccute(f"SELECT IPS FROM users where IPS = ' {session}'")
+	data = await  exccute(f"SELECT IPS FROM users where IPS = ' {session}'")
 	h = r.get(f"http://127.0.0.1:8000/session_check/{session}").json()[0]
 	if len(data[0]) == 1: 
 		ids = str(h)+theme+str(random.choice(range(1000,100000)))
@@ -211,10 +208,10 @@ CREATE TABLE {ids} (
 
 
 @app.post("/send_message")
-def sm(request: Request):
+async def sm(request: Request):
 	# json must looks as {user}/{message}/{thd}/{session}
 
-	data = exccute("SELECT * FROM users")
+	data = await  exccute("SELECT * FROM users")
 	js =  request.json()
 	user = js[0]
 	message = js[1]
@@ -249,17 +246,17 @@ def FAQ(request : Request):
 			return FileResponse("pages/faqEN.html")
 
 @app.get("/smile/{num}")
-def smiles(num:int):
-	
+await def smiles(num:int):
+
 
 	if num == 0:
 		data = []
-		raw = exccute("SELECT * from smiles")
+		raw = await exccute("SELECT * from smiles")
 		for i in raw: data.append(i[0])
 		return data
 	elif num == 1:
 		data = []
-		raw = exccute("SELECT * from smiles")
+		raw = await exccute("SELECT * from smiles")
 		for i in raw: data.append(i[0])
 
 		html = """ """
@@ -277,3 +274,7 @@ def test():
 	
 
 	return htm("I am fine")
+
+@app.get("/debug")
+def debug(request : Request):
+	return htm(f"{request.__dict__}")
