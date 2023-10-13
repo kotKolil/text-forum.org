@@ -65,8 +65,7 @@ async def  exccute(expression):
 	async with aiosqlite.connect('weather.db') as db:
 		await db.execute(expression)
 		await db.commit()
-
-	await return data
+	return data
 
 def gcd():
     current_datetime = datetime.datetime.now()
@@ -89,14 +88,15 @@ def gri():
 async def main(session: str = Cookie(None)):
 	
 
-	data = await  exccute(f"SELECT * FROM users where IPS = ' {session}' ")
-
+	task = asyncio.create_task( exccute(f"SELECT * FROM users where IPS = ' {session}' "))
+	data = await task
 	if len(data) != 0: return FileResponse("pages/main.html")
 	else: return FileResponse("pages/account.html")
 
 @app.get("/logins")
 async def logins():
-	raw = await  exccute("SELECT USERNAME FROM users ORDER BY USERNAME")
+	task = asyncio.create_task(exccute("SELECT USERNAME FROM users ORDER BY USERNAME"))
+	raw = await task
 	data = []
 	for i in raw: data.append(i[0])
 	return data
@@ -104,7 +104,8 @@ async def logins():
 
 @app.get("/registrate/{login}/{password}")
 async def reg(login, password):
-	raw = await  exccute("SELECT USERNAME FROM users ORDER BY USERNAME")
+	task = asyncio.create_task(exccute("SELECT USERNAME FROM users ORDER BY USERNAME"))
+	raw = await tusk
 	data = []
 	for i in raw: data.append(i[0])
 
@@ -135,7 +136,8 @@ async def reg(login, password):
 async def auth(password, login):
 
 
-	data = await  exccute(f"SELECT * FROM users where USERNAME =  '{login}' and PSWD = '{password}' ")
+	task = asyncio.create_task(exccute(f"SELECT * FROM users where USERNAME =  '{login}' and PSWD = '{password}' "))
+	data = await task
 	if len(data) == 0: return ["403"]
 	else: return ["200", data[0][1]]
 
@@ -146,7 +148,8 @@ async def auth(password, login):
 async def threads():
 
 
-	h = await exccute("SELECT * FROM  THD")
+	task = asyncio.create_task(exccute("SELECT * FROM  THD"))
+	h = await task
 	return h
 
 @app.get("/thd/{d}")
@@ -157,7 +160,8 @@ def thd(d):
 async def huy(ids):
 	
 
-	h = await  exccute(f"SELECT * FROM  {ids}")
+	task= asyncio.create_task( exccute(f"SELECT * FROM  {ids}"))
+	h = await task
 	return h
 
 @app.get("/session_check/{ids}")
@@ -173,7 +177,8 @@ async def ch_ses(ids):
 async def crt_thd(session, theme):
 	
 
-	data = await  exccute(f"SELECT IPS FROM users where IPS = ' {session}'")
+	task = asyncio.create_task( exccute(f"SELECT IPS FROM users where IPS = ' {session}'"))
+	data = await task
 	h = r.get(f"http://127.0.0.1:8000/session_check/{session}").json()[0]
 	if len(data[0]) == 1: 
 		ids = str(h)+theme+str(random.choice(range(1000,100000)))
@@ -211,7 +216,8 @@ CREATE TABLE {ids} (
 async def sm(request: Request):
 	# json must looks as {user}/{message}/{thd}/{session}
 
-	data = await  exccute("SELECT * FROM users")
+	task  = asyncio.create_task( exccute("SELECT * FROM users"))
+	data = await task
 	js =  request.json()
 	user = js[0]
 	message = js[1]
@@ -246,17 +252,19 @@ def FAQ(request : Request):
 			return FileResponse("pages/faqEN.html")
 
 @app.get("/smile/{num}")
-await def smiles(num:int):
+async def smiles(num:int):
 
 
 	if num == 0:
 		data = []
-		raw = await exccute("SELECT * from smiles")
+		task  = asyncio.create_task( exccute("SELECT * from smiles"))
+		raw = await task
 		for i in raw: data.append(i[0])
 		return data
 	elif num == 1:
 		data = []
-		raw = await exccute("SELECT * from smiles")
+		task  = asyncio.create_task(exccute("SELECT * from smiles"))
+		raw = await task
 		for i in raw: data.append(i[0])
 
 		html = """ """
