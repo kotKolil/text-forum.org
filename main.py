@@ -15,6 +15,7 @@ import datetime
 import requests as r
 import aiosqlite
 import asyncio
+import json
 
 #создаём объект приложения
 app = FastAPI()
@@ -105,18 +106,23 @@ async def logins():
 
 @app.get("/registrate/{login}/{password}")
 async def reg(login, password):
-	task = asyncio.create_task(exccute("SELECT USERNAME FROM users ORDER BY USERNAME"))
-	raw = await tusk
-	data = []
-	for i in raw: data.append(i[0])
+	conn = sql.connect('db.db', timeout=7)
+	cursor = conn.cursor()
+	expression =  "SELECT USERNAME FROM users GROUP BY USERNAME "
+	cursor.execute(expression)
+	data = cursor.fetchall()
+	conn.close()
 
-	if login in data: return [403]
+	for i in data:
+		if login == i[0]:
+			return [403]
 
 	else:
 
 
 		ids = gri()
-		raw =  exccute("SELECT IPS FROM users ORDER BY USERNAME")
+		task  = asyncio.create_task(  exccute("SELECT IPS FROM users ORDER BY USERNAME"))
+		raw = await task
 		data = []
 		for i in raw: data.append(i[0])
 		if ids in data: ids = gri()
@@ -219,7 +225,7 @@ async def sm(request: Request):
 
 	task  = asyncio.create_task( exccute("SELECT * FROM users"))
 	data = await task
-	js =  request.json()
+	js = await request.json()
 	user = js[0]
 	message = js[1]
 	thd = js[2]
