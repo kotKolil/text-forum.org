@@ -16,11 +16,19 @@ import requests as r
 import aiosqlite
 import asyncio
 import json
+from aiologger.loggers.json import JsonLogger
 
 #создаём объект приложения
 app = FastAPI()
 
 #генератор индефикаторов сессии
+
+
+logger = JsonLogger.with_default_handlers(
+            level='DEBUG',
+            serializer_kwargs={'ensure_ascii': False},
+        )
+
 
 
 #путь где лежит приложение
@@ -67,6 +75,7 @@ async def  exccute(expression):
 		cursor = await db.execute(expression)
 		data = await cursor.fetchall()
 		await db.commit()
+		await logger.info(f'был выполнен запрос {expression}')
 	return data
 
 def gcd():
@@ -136,6 +145,7 @@ async def reg(login, password):
 		cursor.execute(expression, params)
 		conn.commit()
 		conn.close()
+		await logger.info(f'зарегистрирован {login} {password} {ids}')
 		return [ids]
 
 #аунтефикация
